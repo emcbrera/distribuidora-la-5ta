@@ -1,0 +1,166 @@
+﻿<section class="page-card" aria-labelledby="registration-title">
+  <p class="eyebrow">Despachos</p>
+  <h1 id="registration-title">Registro de despacho</h1>
+  <p>Completa la solicitud. El despacho se autorizará después de verificar las existencias.</p>
+  <p class="required-note">Todos los campos son obligatorios.</p>
+  <form [formGroup]="form" (ngSubmit)="submit()" [attr.aria-busy]="sending()" novalidate>
+    <div class="form-grid">
+      <div class="field">
+        <label for="solicitante">Solicitante</label>
+        <input
+          id="solicitante"
+          formControlName="solicitante"
+          autocomplete="name"
+          required
+          [attr.aria-invalid]="invalid('solicitante')"
+          aria-describedby="solicitante-error"
+        />
+        <span id="solicitante-error" class="field-error">
+          @if (invalid('solicitante')) {
+            Escribe el nombre del solicitante.
+          }
+        </span>
+      </div>
+      <div class="field">
+        <label for="correo">Correo electrónico</label>
+        <input
+          id="correo"
+          type="email"
+          formControlName="correo"
+          autocomplete="email"
+          required
+          [attr.aria-invalid]="invalid('correo')"
+          aria-describedby="correo-error"
+        />
+        <span id="correo-error" class="field-error">
+          @if (invalid('correo')) {
+            Escribe un correo electrónico válido.
+          }
+        </span>
+      </div>
+      <div class="field">
+        <label for="codigo_producto">Código del producto</label>
+        <input
+          id="codigo_producto"
+          formControlName="codigo_producto"
+          placeholder="Ej. INS-0101"
+          spellcheck="false"
+          required
+          [attr.aria-invalid]="invalid('codigo_producto')"
+          aria-describedby="codigo-error"
+        />
+        <span id="codigo-error" class="field-error">
+          @if (invalid('codigo_producto')) {
+            Escribe el código del producto.
+          }
+        </span>
+      </div>
+      <div class="field">
+        <label for="cantidad">Cantidad</label>
+        <input
+          id="cantidad"
+          type="number"
+          formControlName="cantidad"
+          min="1"
+          step="1"
+          required
+          [attr.aria-invalid]="invalid('cantidad')"
+          aria-describedby="cantidad-error"
+        />
+        <span id="cantidad-error" class="field-error">
+          @if (invalid('cantidad')) {
+            Ingresa una cantidad entera mayor que cero.
+          }
+        </span>
+      </div>
+      <div class="field">
+        <label for="destino">Destino</label>
+        <input
+          id="destino"
+          formControlName="destino"
+          placeholder="Restaurante, cafetería o sede"
+          required
+          [attr.aria-invalid]="invalid('destino')"
+          aria-describedby="destino-error"
+        />
+        <span id="destino-error" class="field-error">
+          @if (invalid('destino')) {
+            Escribe el destino de la mercancía.
+          }
+        </span>
+      </div>
+      <div class="field">
+        <label for="motivo">Motivo</label>
+        <select
+          id="motivo"
+          formControlName="motivo"
+          required
+          [attr.aria-invalid]="invalid('motivo')"
+          aria-describedby="motivo-error"
+        >
+          <option value="despacho">Despacho</option>
+          <option value="traslado entre sedes">Traslado entre sedes</option>
+          <option value="avería">Avería</option>
+        </select>
+        <span id="motivo-error" class="field-error">
+          @if (invalid('motivo')) {
+            Selecciona un motivo válido.
+          }
+        </span>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit" [disabled]="sending()">
+        {{ sending() ? 'Enviando solicitud…' : 'Enviar solicitud' }}
+      </button>
+      <span role="status">
+        @if (sending()) {
+          Estamos verificando las existencias. Espera el resultado.
+        }
+      </span>
+    </div>
+  </form>
+  <div aria-live="polite" aria-atomic="true">
+    @if (result(); as response) {
+      <section
+        class="result"
+        [class.success]="response.resultado === 'APROBADO'"
+        [class.warning]="response.resultado === 'APROBADO_CON_ALERTA'"
+        [class.rejected]="
+          response.resultado === 'RECHAZADO' || response.resultado === 'PRODUCTO_INEXISTENTE'
+        "
+      >
+        <h2>{{ resultLabels[response.resultado] }}</h2>
+        <p>{{ response.mensaje }}</p>
+        @if (response.resultado === 'APROBADO' || response.resultado === 'APROBADO_CON_ALERTA') {
+          <dl>
+            <div>
+              <dt>Existencias anteriores</dt>
+              <dd>{{ response.existencias_anteriores }}</dd>
+            </div>
+            <div>
+              <dt>Saldo disponible</dt>
+              <dd>{{ response.saldo }}</dd>
+            </div>
+            <div>
+              <dt>Mínimo de inventario</dt>
+              <dd>{{ response.minimo }}</dd>
+            </div>
+          </dl>
+        }
+      </section>
+    }
+  </div>
+  <div role="alert">
+    @if (error(); as message) {
+      <section class="result rejected">
+        <h2>No pudimos confirmar el resultado</h2>
+        <p>{{ message }}</p>
+        <p>
+          Antes de volver a enviar, verifica si la solicitud fue procesada para evitar duplicar la
+          salida.
+        </p>
+      </section>
+    }
+  </div>
+</section>

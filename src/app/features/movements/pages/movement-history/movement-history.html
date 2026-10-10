@@ -1,0 +1,99 @@
+﻿<section class="page-card" aria-labelledby="history-title" [attr.aria-busy]="state() === 'loading'">
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Movimientos</p>
+      <h1 id="history-title">Historial de movimientos</h1>
+    </div>
+    <button type="button" (click)="refresh()" [disabled]="state() === 'loading'">
+      {{ state() === 'loading' ? 'Consultando…' : 'Actualizar' }}
+    </button>
+  </div>
+  <p>
+    Consulta las salidas de inventario autorizadas. Las fechas se muestran en hora de Colombia
+    (UTC−5).
+  </p>
+  <div role="status" aria-live="polite">
+    @if (state() === 'loading') {
+      <p class="notice">Estamos consultando los movimientos.</p>
+    }
+    @if (state() === 'unconfigured') {
+      <div class="notice">
+        <h2>Consulta aún no configurada</h2>
+        <p>El historial estará disponible cuando se configure su conexión de consulta.</p>
+      </div>
+    }
+    @if (state() === 'ready' && movements().length === 0) {
+      <div class="notice">
+        <h2>No hay movimientos registrados</h2>
+        <p>Los despachos autorizados aparecerán aquí cuando se registren.</p>
+      </div>
+    }
+    @if (state() === 'ready' && movements().length > 0) {
+      <p class="count">{{ movements().length }} movimiento(s) registrado(s).</p>
+    }
+  </div>
+  <div role="alert">
+    @if (state() === 'error') {
+      <div class="notice error">
+        <h2>No pudimos consultar el historial</h2>
+        <p>{{ error() }}</p>
+        <p>Puedes volver a consultar con el botón Actualizar.</p>
+      </div>
+    }
+  </div>
+  @if (state() === 'ready' && movements().length > 0) {
+    <div
+      class="table-scroll"
+      tabindex="0"
+      role="region"
+      aria-label="Tabla de movimientos, desplazable horizontalmente"
+    >
+      <table>
+        <caption>
+          Salidas autorizadas de inventario
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Fecha y hora</th>
+            <th scope="col">Producto y código</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Destino</th>
+            <th scope="col">Solicitante</th>
+            <th scope="col">Motivo</th>
+            <th scope="col">Saldo</th>
+            <th scope="col">Resultado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (movement of movements(); track $index) {
+            <tr>
+              <td>
+                <time [attr.datetime]="movement.fecha_hora">{{
+                  movement.fecha_hora | date: 'dd/MM/yyyy HH:mm:ss' : '-0500'
+                }}</time>
+              </td>
+              <td>
+                <strong>{{ movement.producto }}</strong
+                ><span class="secondary">{{ movement.codigo_producto }}</span>
+              </td>
+              <td class="number">{{ movement.cantidad }}</td>
+              <td>{{ movement.destino }}</td>
+              <td>{{ movement.solicitante }}</td>
+              <td>{{ movement.motivo }}</td>
+              <td class="number">{{ movement.saldo }}</td>
+              <td>
+                <span
+                  class="badge"
+                  [class.warning]="movement.resultado === 'APROBADO_CON_ALERTA'"
+                  >{{
+                    movement.resultado === 'APROBADO' ? 'Aprobado' : 'Aprobado con alerta'
+                  }}</span
+                >
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

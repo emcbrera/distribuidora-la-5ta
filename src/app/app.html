@@ -1,0 +1,19 @@
+﻿<a class="skip-link" href="#main-content">Ir al contenido</a>
+<header class="app-header">
+  <a class="brand" routerLink="/despachos/registro" aria-label="La Quinta, inicio">
+    <span class="brand-mark" aria-hidden="true">5</span>
+    <span><strong>La Quinta</strong><span class="brand-caption">Control de despachos</span></span>
+  </a>
+  <nav aria-label="Navegación principal">
+    <a routerLink="/despachos/registro" routerLinkActive="active" ariaCurrentWhenActive="page"
+      >Registro de despacho</a
+    >
+    <a routerLink="/movimientos" routerLinkActive="active" ariaCurrentWhenActive="page"
+      >Historial de movimientos</a
+    >
+  </nav>
+</header>
+<main id="main-content" tabindex="-1">
+  <router-outlet />
+</main>
+<footer class="app-footer">Distribuidora La Quinta S.A.S.</footer>
